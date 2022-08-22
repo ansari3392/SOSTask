@@ -13,6 +13,7 @@ class UserTypeAdmin(admin.ModelAdmin):
 
 @admin.register(CustomUser)
 class UserAdmin(UserAdmin):
-    list_display = ('id', 'username', 'is_superuser')
-    list_filter = ('username', 'user_type')
+    list_display = ('id', 'email', 'is_superuser')
+    list_filter = ('email', 'user_type')
+    ordering = ('email', )
 
