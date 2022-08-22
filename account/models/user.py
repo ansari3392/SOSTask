@@ -38,6 +38,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(
         unique=True,
         )
+    is_verified = models.BooleanField(default=False)
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
