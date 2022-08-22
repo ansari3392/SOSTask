@@ -18,7 +18,7 @@ class ResetPasswordRequestAPIView(APIView):
 
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email=email)
-            user.send_reset_password_link()
+            user.send_reset_password_link(self.request)
             return Response({'message': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'Email not found'}, status=status.HTTP_400_BAD_REQUEST)
