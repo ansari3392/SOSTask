@@ -7,6 +7,7 @@ from account.api.serializers.register import RegisterSerializer
 User = get_user_model()
 
 
-class RegisterView(CreateAPIView):
+class RegisterAPIView(CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+

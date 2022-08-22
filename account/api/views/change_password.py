@@ -9,7 +9,7 @@ from account.api.serializers.change_password import ChangePasswordSerializer
 User = get_user_model()
 
 
-class ChangePasswordView(APIView):
+class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def put(self, *args, **kwargs):
