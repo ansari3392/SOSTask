@@ -32,9 +32,8 @@ class PasswordTokenCheckAPIView(APIView):
 
 
 class SetNewPasswordAPIView(APIView):
-    serializer_class = SetNewPasswordSerializer
 
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+    def post(self, *args, **kwargs):
+        serializer = SetNewPasswordSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'message': 'Password reset success'}, status=status.HTTP_200_OK)

@@ -4,7 +4,7 @@ from rest_framework import serializers
 User = get_user_model()
 
 
-class ChangePasswordSerializer(serializers.ModelSerializer):
+class ChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -23,10 +23,6 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         allow_blank=False,
         allow_null=False
     )
-
-    class Meta:
-        model = User
-        fields = ('old_password', 'password', 'password2')
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:

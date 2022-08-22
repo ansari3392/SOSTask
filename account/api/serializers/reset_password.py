@@ -7,23 +7,21 @@ from rest_framework.exceptions import AuthenticationFailed
 
 User = get_user_model()
 
-
-class ResetPasswordRequestSerializer(serializers.ModelSerializer):
+class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(
         required=True,
         min_length=2
     )
 
-    class Meta:
-        model = User
-        fields = ('email',)
-
-
 class PasswordTokenCheckSerializer(serializers.Serializer):
     token = serializers.CharField(
-        min_length=1, write_only=True)
+        min_length=1,
+        write_only=True
+    )
     uidb64 = serializers.CharField(
-        min_length=1, write_only=True)
+        min_length=1,
+        write_only=True
+    )
 
     def validate(self, attrs):
         try:
