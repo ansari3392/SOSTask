@@ -180,8 +180,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #Using this for
 # EMAIL_HOST_PASSWORD=
 # EMAIL_USE_TLS=True
 
-
-
-
-
-
+TEMP_TOKEN_LIFETIME = 24  # in hour

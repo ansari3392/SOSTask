@@ -5,9 +5,24 @@ User = get_user_model()
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-    password2 = serializers.CharField(write_only=True, required=True)
-    old_password = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        allow_blank=False,
+        allow_null=False
+    )
+    password2 = serializers.CharField(
+        write_only=True,
+        required=True,
+        allow_blank=False,
+        allow_null=False
+    )
+    old_password = serializers.CharField(
+        write_only=True,
+        required=True,
+        allow_blank=False,
+        allow_null=False
+    )
 
     class Meta:
         model = User

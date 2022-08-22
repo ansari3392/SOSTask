@@ -12,14 +12,14 @@ User = get_user_model()
 class ChangePasswordAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def put(self, *args, **kwargs):
+    def post(self, *args, **kwargs):
         serializer = ChangePasswordSerializer(
             data=self.request.data,
             context={'request': self.request}
         )
-        user = self.request.user
         serializer.is_valid(raise_exception=True)
         password = serializer.validated_data.get('password')
+        user = self.request.user
         user.set_password(password)
         user.save()
 

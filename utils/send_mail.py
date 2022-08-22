@@ -1,7 +1,7 @@
 from django.core.mail import send_mail
 
 
-def send_email(data):
+adef send_email(data: dict) -> None:
     send_mail(
         subject=data['subject'],
         message=data['message'],
