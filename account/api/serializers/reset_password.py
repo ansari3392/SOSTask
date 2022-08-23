@@ -7,11 +7,13 @@ from rest_framework.exceptions import AuthenticationFailed
 
 User = get_user_model()
 
+
 class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(
         required=True,
         min_length=2
     )
+
 
 class PasswordTokenCheckSerializer(serializers.Serializer):
     token = serializers.CharField(

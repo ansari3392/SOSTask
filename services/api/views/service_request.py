@@ -1,16 +1,19 @@
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from services.api.serializers.service_request import ServiceRequestSerializer
+from services.api.serializers.service_request import RequestServiceCreateSerializer, RequestServiceConfirmSerializer, RequestServiceUpdateRetrieveSerializer
+from services.models import RequestService
 
 
-class RequestServiceAPIView(APIView):
+class RequestServiceCreateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, *args, **kwargs):
-        serializer = ServiceRequestSerializer(
+        serializer = RequestServiceCreateSerializer(
             data=self.request.data,
             context={'request': self.request}
         )
@@ -23,3 +26,49 @@ class RequestServiceAPIView(APIView):
             status=status.HTTP_201_CREATED
         )
 
+
+class RequestServiceDetailAPIView(RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = RequestServiceUpdateRetrieveSerializer
+    queryset = RequestService.objects.all()
+
+
+class RequestServiceUpdateAPIView(UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = RequestServiceUpdateRetrieveSerializer
+
+    def get_queryset(self):
+        queryset = RequestService.objects.filter(user=self.request.user)
+        return queryset
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        pk = self.kwargs.get('pk')
+        obj: RequestService = get_object_or_404(queryset, pk=pk)
+        if obj.is_confirmed:
+            raise ValidationError({'message': 'You cannot edit confirmed requests'})
+        return obj
+
+
+class ConfirmRequestServiceAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, *args, **kwargs):
+        serializer = RequestServiceConfirmSerializer(
+            data=self.request.data,
+            context={'request': self.request}
+        )
+        serializer.is_valid(raise_exception=True)
+        request_service: RequestService = serializer.validated_data.get('request_service')
+        request_service.confirm_request()
+
+        status_code = status.HTTP_200_OK
+        response = {
+            'message': 'confirmed successfully',
+            'payment_url': 'https://google.com'
+        }
+
+        return Response(
+            data=response,
+            status=status_code
+        )

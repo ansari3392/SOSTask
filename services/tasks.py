@@ -2,7 +2,6 @@ from datetime import timedelta
 
 from celery import shared_task
 from django.conf import settings
-from django.db.models import F
 from django.utils import timezone
 
 from .models.request_service import RequestService

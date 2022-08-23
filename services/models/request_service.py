@@ -1,12 +1,10 @@
-from django.contrib.auth import get_user_model
-from django.core import validators
+from django.conf import settings
 from django.db import models
-from django.db.models import F
 from django.utils import timezone
 
 from services.models import Service
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 
 class RequestService(models.Model):
@@ -19,7 +17,7 @@ class RequestService(models.Model):
     service = models.ForeignKey(
         Service,
         on_delete=models.CASCADE,
-        related_name='request',
+        related_name='requests',
     )
 
     class StateChoices(models.TextChoices):
@@ -30,7 +28,7 @@ class RequestService(models.Model):
 
     state = models.CharField(
         'state',
-        max_length=10,
+        max_length=9,
         default=StateChoices.CREATED,
         choices=StateChoices.choices,
         db_index=True,
@@ -46,14 +44,6 @@ class RequestService(models.Model):
     )
     photo = models.ImageField(
         upload_to="images",
-        validators=[
-            getattr(
-                validators,
-                'FileExtensionValidator')(
-                allowed_extensions=[
-                    'jpg',
-                    'png',
-                ])],
     )
     service_price = models.PositiveBigIntegerField(
         null=True,
@@ -69,8 +59,7 @@ class RequestService(models.Model):
                   ' به صورت اتوماتیک ذخیره میشود تا در صورت تغییر درصد کارمزد و یا تغییر نوع عضویت کاربر،'
                   ' درخواست های ثبت شده تغییر قیمت نداشته باشند.'
     )
-
-    is_verified = models.BooleanField(default=False)
+    is_confirmed = models.BooleanField(default=False)
 
     confirmed_at = models.DateTimeField(
         auto_now=True,
@@ -85,24 +74,19 @@ class RequestService(models.Model):
         verbose_name = 'Request Service'
         verbose_name_plural = 'Request Services'
 
-    @staticmethod
-    def get_fee():
-        fee = F('service__price') * F('user__user_type__percent')
+    def get_fee(self) -> int:
+        fee = (self.service.price * self.user.user_type.percent) / 100
         return fee
 
-    def get_service_request_price(self):
-        total_price = (F('service__price') + self.get_fee())
-        return total_price
+    def get_service_request_price(self) -> int:
+        if self.state == self.StateChoices.CONFIRMED:
+            return self.service_price + self.fee
+        return self.service.price + self.get_fee()
 
-    def confirm_request(self):
+    def confirm_request(self) -> None:
         self.state = self.StateChoices.CONFIRMED
-
-        fee = self.user.user_type.percent
-        self.fee = fee
-
-        price = self.service.price
-        self.service_price = price
-
+        self.is_confirmed = True
+        self.fee = (self.service.price * self.user.user_type.percent) / 100
+        self.service_price = self.service.price
         self.confirmed_at = timezone.now()
-
         self.save()

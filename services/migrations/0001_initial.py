@@ -3,8 +3,23 @@
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):
+# def create_service(apps, schema_editor):
+#     Service = apps.get_model('services', 'Service')
+#     Service.objects.create(
+#         name='سرویس نامه رسان',
+#         price=10000
+#     )
+#     Service.objects.create(
+#         name='سرویس سوخت رسان',
+#         price=20000
+#     )
+#     Service.objects.create(
+#         name='سرویس امداد رسان',
+#         price=30000
+#     )
 
+
+class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
@@ -19,4 +34,6 @@ class Migration(migrations.Migration):
                 ('price', models.PositiveIntegerField(default=0)),
             ],
         ),
+        # run a python script after migration
+        # migrations.RunPython(create_service, migrations.RunPython.noop),
     ]

@@ -11,6 +11,6 @@ class ServiceAdmin(admin.ModelAdmin):
 
 @admin.register(RequestService)
 class RequestServiceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'state', 'user')
-    list_filter = ('state', 'user')
+    list_display = ('id', 'state', 'user', 'is_confirmed', 'service')
+    list_filter = ('state', 'user', 'is_confirmed', 'service')
 
