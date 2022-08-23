@@ -1,11 +1,12 @@
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView, get_object_or_404, RetrieveUpdateAPIView
+from rest_framework.generics import UpdateAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from services.api.serializers.service_request import RequestServiceCreateSerializer, RequestServiceConfirmSerializer, RequestServiceUpdateRetrieveSerializer
+from services.api.serializers.service_request import RequestServiceCreateSerializer, RequestServiceConfirmSerializer, \
+    RequestServiceUpdateRetrieveSerializer
 from services.models import RequestService
 
 
@@ -30,7 +31,10 @@ class RequestServiceCreateAPIView(APIView):
 class RequestServiceDetailAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = RequestServiceUpdateRetrieveSerializer
-    queryset = RequestService.objects.all()
+
+    def get_queryset(self):
+        queryset = RequestService.objects.filter(user=self.request.user)
+        return queryset
 
 
 class RequestServiceUpdateAPIView(UpdateAPIView):

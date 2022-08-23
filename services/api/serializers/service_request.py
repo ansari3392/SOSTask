@@ -52,6 +52,7 @@ class RequestServiceUpdateRetrieveSerializer(ModelSerializer):  # user should se
         fields = (
             'id',
             'service',
+            'state',
             'service_name',
             'user_extra_description',
             'staff_extra_description',
@@ -64,6 +65,7 @@ class RequestServiceUpdateRetrieveSerializer(ModelSerializer):  # user should se
             'service_name',
             'request_total_price',
             'staff_extra_description',
+            'state',
             'is_confirmed',
         ]
 

@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 
@@ -90,3 +92,29 @@ class RequestService(models.Model):
         self.service_price = self.service.price
         self.confirmed_at = timezone.now()
         self.save()
+
+    def clean(self):
+        super().clean()
+        should_notify = False
+        if self.pk:
+            old_request = RequestService.objects.get(pk=self.pk)
+            if all([
+                self.state == self.StateChoices.CANCELED,
+                old_request.state != self.state
+            ]):
+                should_notify = True
+
+        elif self.state == self.StateChoices.CANCELED:
+            should_notify = True
+        if should_notify:
+            if not self.staff_extra_description:
+                raise ValidationError('You need to enter some extra description to send to the user')
+            self.send_rejection_email()
+
+    def send_rejection_email(self):
+        send_mail(
+            subject='Your request has been rejected',
+            message=self.staff_extra_description,
+            from_email='admin@website.com',
+            recipient_list=[self.user.email]
+        )

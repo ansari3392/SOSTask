@@ -3,6 +3,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
 from django.db import models
 from django.http import HttpRequest
 from django.urls import reverse
@@ -10,7 +11,6 @@ from django.utils.encoding import smart_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from account.models import UserType
-from utils.send_mail import send_email
 from utils.token import create_temp_token
 
 
@@ -80,14 +80,12 @@ class CustomUser(AbstractUser):
         abs_url = 'http://' + current_site + relativeLink + "?token=" + str(token)
         message = 'Hi ' + self.first_name + \
                   ' Use the link below to verify your email \n' + abs_url
-        data = {
-            'message': message,
-            'to_email': self.email,
-            'from_email': settings.EMAIL_HOST_USER,
-            'subject': 'Verify your email'
-        }
-
-        send_email(data)
+        send_mail(
+            subject='Verify your email',
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[self.email]
+        )
 
     def send_reset_password_link(self, request: HttpRequest) -> None:
         uidb64 = urlsafe_base64_encode(smart_bytes(self.id))
@@ -97,15 +95,12 @@ class CustomUser(AbstractUser):
         message = 'Hello, \n Use link below to reset your password  \n' + \
                   'http://' + current_site + reverse(
             'account:api:password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
-
-        data = {
-            'subject': 'Reset your password',
-            'message': message,
-            'from_email': settings.EMAIL_HOST_USER,
-            'to_email': self.email
-        }
-
-        send_email(data)
+        send_mail(
+            subject='Reset your password',
+            message=message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[self.email]
+        )
 
     def activate(self):
         self.is_active = True
